@@ -60,12 +60,21 @@ $worktreeList = & git -C $RepoDir worktree list 2>&1
 if (-not ($worktreeList | Select-String ([regex]::Escape($WorktreeDir)))) {
     Write-Host "Creating worktree at $WorktreeDir..."
     New-Item -ItemType Directory -Force -Path (Split-Path $WorktreeDir) | Out-Null
+
     # Ensure branch exists locally
     $branches = & git -C $RepoDir branch --list "greedo/claude-sync" 2>&1
     if (-not $branches) {
         Write-Host "Fetching greedo/claude-sync from origin..."
         & git -C $RepoDir fetch origin "greedo/claude-sync:greedo/claude-sync"
     }
+
+    # A branch can't be in two worktrees. If main repo is on greedo/claude-sync, switch it to main.
+    $currentBranch = (& git -C $RepoDir rev-parse --abbrev-ref HEAD 2>&1).Trim()
+    if ($currentBranch -eq "greedo/claude-sync") {
+        Write-Host "Main repo is on greedo/claude-sync; switching it to main first..."
+        & git -C $RepoDir checkout main
+    }
+
     & git -C $RepoDir worktree add $WorktreeDir "greedo/claude-sync"
     Write-Host "Worktree created."
 } else {
@@ -99,7 +108,7 @@ Register-ScheduledTask `
     -Trigger  $trigger `
     -Settings $settings `
     -Description "Syncs AWG26/t3code fork with pingdotgg/t3code upstream every 30 minutes. Source: $SyncScript" `
-    -RunLevel Highest | Out-Null
+    -RunLevel Limited | Out-Null
 
 Write-Host "Task registered."
 

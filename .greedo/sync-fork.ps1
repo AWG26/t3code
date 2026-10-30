@@ -33,9 +33,9 @@ if (-not $StatusFile) { $StatusFile = Join-Path $RepoDir ".greedo\sync-status.js
 $logLine = { param($msg) Write-Host "$(Get-Date -Format 'HH:mm:ss') $msg" }
 
 function Run-Git {
-    param([string]$Dir, [string[]]$Args)
-    $result = & git -C $Dir @Args 2>&1
-    if ($LASTEXITCODE -ne 0) { throw "git $($Args -join ' ') failed in $Dir :`n$result" }
+    param([string]$Dir, [string[]]$GitArgs)
+    $result = & git -C $Dir @GitArgs 2>&1
+    if ($LASTEXITCODE -ne 0) { throw "git $($GitArgs -join ' ') failed in $Dir :`n$result" }
     $result
 }
 
