@@ -91,9 +91,13 @@ if ($existingTask) {
 
 Write-Host "Registering scheduled task '$TaskName' (every 30 minutes)..."
 
+# Use wscript.exe launcher — Task Scheduler ignores -WindowStyle Hidden on pwsh.exe
+# and spawns a visible terminal. WScript.Shell.Run with style 0 is the correct hidden path.
+$LauncherScript = Join-Path $WorktreeDir ".greedo\sync-fork-launcher.vbs"
+
 $action = New-ScheduledTaskAction `
-    -Execute "pwsh.exe" `
-    -Argument "-NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$SyncScript`" -RepoDir `"$RepoDir`" -WorktreeDir `"$WorktreeDir`""
+    -Execute "wscript.exe" `
+    -Argument "`"$LauncherScript`""
 
 # Repeat every 30 minutes indefinitely
 $trigger = New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Minutes 30) -Once -At (Get-Date)
