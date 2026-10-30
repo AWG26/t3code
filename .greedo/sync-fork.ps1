@@ -28,7 +28,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-if (-not $StatusFile) { $StatusFile = Join-Path $RepoDir ".greedo\sync-status.json" }
+# Status file lives in the worktree (always present regardless of main checkout branch)
+if (-not $StatusFile) { $StatusFile = Join-Path $WorktreeDir ".greedo\sync-status.json" }
 
 $logLine = { param($msg) Write-Host "$(Get-Date -Format 'HH:mm:ss') $msg" }
 
@@ -68,8 +69,10 @@ try {
     $status.pushed_main  = $true
 
     # 3. Ensure worktree exists
+    # git worktree list uses forward slashes on Windows — normalize for comparison
     $worktreeList = & git -C $RepoDir worktree list 2>&1
-    $worktreeExists = $worktreeList | Select-String ([regex]::Escape($WorktreeDir))
+    $normalizedWorktreeDir = $WorktreeDir.Replace("\", "/")
+    $worktreeExists = $worktreeList | Select-String ([regex]::Escape($normalizedWorktreeDir))
     if (-not $worktreeExists) {
         & $logLine "Creating worktree at $WorktreeDir..."
         # Ensure the branch exists locally first

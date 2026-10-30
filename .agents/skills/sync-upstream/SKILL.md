@@ -20,7 +20,7 @@ The worktree for `greedo/claude-sync` lives at `C:\t3worktree\greedo`.
 ### Step 1 — Read the status file
 
 ```powershell
-Get-Content C:\t3code\.greedo\sync-status.json | ConvertFrom-Json
+Get-Content C:\t3worktree\greedo\.greedo\sync-status.json | ConvertFrom-Json
 ```
 
 Interpret the fields:
@@ -107,5 +107,5 @@ greedo/claude-sync  ──── our work, rebased on top (auto-rebased if clean
 | Feature worktree | `C:\t3worktree\greedo` |
 | Sync script | `C:\t3code\.greedo\sync-fork.ps1` |
 | Installer | `C:\t3code\.greedo\install.ps1` |
-| Status file | `C:\t3code\.greedo\sync-status.json` |
+| Status file | `C:\t3worktree\greedo\.greedo\sync-status.json` |
 | Scheduled task | `T3ForkSync` (Task Scheduler) |

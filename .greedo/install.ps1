@@ -32,7 +32,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$SyncScript = Join-Path $RepoDir ".greedo\sync-fork.ps1"
+# Sync script lives in the worktree (greedo/claude-sync branch), not main repo
+$SyncScript = Join-Path $WorktreeDir ".greedo\sync-fork.ps1"
 
 Write-Host "=== GREEDO fork automation installer ==="
 Write-Host "RepoDir    : $RepoDir"
@@ -92,7 +93,7 @@ Write-Host "Registering scheduled task '$TaskName' (every 30 minutes)..."
 
 $action = New-ScheduledTaskAction `
     -Execute "pwsh.exe" `
-    -Argument "-NonInteractive -WindowStyle Hidden -File `"$SyncScript`" -RepoDir `"$RepoDir`" -WorktreeDir `"$WorktreeDir`""
+    -Argument "-NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$SyncScript`" -RepoDir `"$RepoDir`" -WorktreeDir `"$WorktreeDir`""
 
 # Repeat every 30 minutes indefinitely
 $trigger = New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Minutes 30) -Once -At (Get-Date)
